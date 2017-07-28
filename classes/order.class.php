@@ -139,7 +139,10 @@ class Order {
 	 * @param int $customer_id
 	 * @return bool
 	 */
-	public function createDownload($product_id, $order_inv_id, $customer_id = '') {
+	public function createDownload($product_id, $order_inv_id, $customer_id = '', $order_id = '') {
+		if(!empty($order_id)) {
+			$this->_order_id = 	$order_id;
+		}
 		if(empty($product_id) || empty($order_inv_id)) return false;
 		$this->_order_summary['customer_id'] = $customer_id;
 		return $this->_createDownload($product_id, $order_inv_id);
@@ -235,7 +238,8 @@ class Order {
 		$vars = array();
 		foreach ($this->_order_inventory as $item) {
 			if ($item['product_id']>0) {
-				$product    = array_merge($GLOBALS['catalogue']->getProductData($item['product_id']), $item);
+				$existing_data = $GLOBALS['catalogue']->getProductData($item['product_id']);
+				$product    = is_array($existing_data) ? array_merge($existing_data, $item) : $item;
 				$product['item_price'] = Tax::getInstance()->priceFormat($product['price']);
 				$product['price']   = Tax::getInstance()->priceFormat($product['price']*$product['quantity']);
 				if (!empty($product['product_options']))  $product['product_options'] = implode(' ', unserialize($item['product_options']));
@@ -405,10 +409,10 @@ class Order {
 							$this->assignOrderDetails(null, true);
 							$admin_mailer->sendEmail($admin_notify, $content);
 							$GLOBALS['session']->set($message_id, true, 'email');
-							unset($content);
 						}
+						unset($content);
 					}
-				
+					
 				break;
 
 				case self::ORDER_PROCESS;
@@ -426,8 +430,8 @@ class Order {
 					if ($this->_email_enabled && ($content = $mailer->loadContent('cart.order_confirmation', $order_summary['lang'])) !== false) {
 						$this->assignOrderDetails();
 						$mailer->sendEmail($this->_order_summary['email'], $content);
-						unset($content);
 					}
+					unset($content);
 
 					// Send email to store admins if set for processing status
 					if ($GLOBALS['config']->get('config', 'admin_notify_status')=="2" && $this->_email_enabled && $this->_email_admin_enabled && $admin_notify = $this->_notifyAdmins()) {
@@ -439,8 +443,8 @@ class Order {
 							$this->assignOrderDetails(null, true);
 							$admin_mailer->sendEmail($admin_notify, $content);
 							$GLOBALS['session']->set($message_id, true, 'email');
-							unset($content);
 						}
+						unset($content);
 					}
 
 					// Send digital files
@@ -472,8 +476,8 @@ class Order {
 					if (!$this->_skip_order_complete_email && $this->_email_enabled && ($content = $mailer->loadContent('cart.order_complete', $order_summary['lang'])) !== false) {
 						$this->assignOrderDetails();
 						$mailer->sendEmail($this->_order_summary['email'], $content);
-						unset($content);
 					}
+					unset($content);
 
 				break;
 
@@ -652,6 +656,7 @@ class Order {
 			foreach ($options as $option_id => $assign_id) {
 				if (!is_array($assign_id)) {
 					if (($value = $GLOBALS['catalogue']->getOptionData((int)$option_id, (int)$assign_id)) !== false) {
+						foreach ($GLOBALS['hooks']->load('class.cart.get.product_option_prices') as $hook) include $hook;
 						$value['price_display'] = '';
 						if (isset($value['option_price']) && $value['option_price']>0) { // record option price but not zero
 							if ($value['option_negative']) {
@@ -674,6 +679,7 @@ class Order {
 						}
 						
 						if (($value = $GLOBALS['catalogue']->getOptionData((int)$option_id, $assign_id)) !== false) {
+							foreach ($GLOBALS['hooks']->load('class.cart.get.product_option_prices') as $hook) include $hook;
 							$value['price_display'] = '';
 							if (isset($value['option_price']) && $value['option_price']>0) { // record option price but not zero
 								if ($value['option_negative']) {

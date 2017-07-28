@@ -105,7 +105,7 @@ if (isset($_POST['approve']) && is_array($_POST['approve']) && Admin::getInstanc
 	}
 	## origin variable tells us we need to come back to the dashboard now
 	if (isset($_GET['origin']) && !empty($_GET['origin']) && $_GET['origin']=="dashboard") {
-		httpredir('?#product_reviews');
+		httpredir('?', 'product_reviews');
 	}
 }
 
@@ -221,7 +221,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit']) && Admin::getInstance()->p
 			if (($product = $GLOBALS['db']->select('CubeCart_inventory', array('name'), array('product_id' => $review['product_id']))) !== false) {
 				$review['product'] = $product[0];
 				$review['date']  = formatTime($review['time']);
-				$review['delete'] = currentPage(null, array('delete' => (int)$review['id']));
+				$review['delete'] = currentPage(null, array('delete' => (int)$review['id'], 'token' => SESSION_TOKEN));
 				$review['edit']  = currentPage(null, array('edit' => (int)$review['id']));
 				$smarty_data['reviews'][] = $review;
 			} else {
