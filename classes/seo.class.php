@@ -183,6 +183,7 @@ class SEO {
 	 */
 	public function delete($type, $item_id) {
 		if (in_array($type, $this->_dynamic_sections) && is_numeric($item_id)) {
+			$GLOBALS['db']->delete('CubeCart_seo_log', array('type' => $type, 'item_id' => $item_id));
 			return $GLOBALS['db']->delete('CubeCart_seo_urls', array('type' => $type, 'item_id' => $item_id));
 		}
 		return false;
@@ -363,6 +364,13 @@ class SEO {
 					$GLOBALS['cache']->clear();
 					$GLOBALS['session']->set($path, '1', 'seo_retry');
 					httpredir(CC_ROOT_REL.$path);
+				} else if(($item = $GLOBALS['db']->select('CubeCart_seo_log',false,array('past_path' => $path))) !== false) { // We now look for a past_path. Query for it.
+					$current_path = $this->getdbPath($item[0]['type'], $item[0]['item_id']);
+					if(!empty($current_path)) { // Found a past path for this type,item_id. Get the real SEO path and 301 bounce.
+						httpredir(CC_ROOT_REL.$current_path,false,false,301);
+					} else { // Did not find a past path for this type,item_id. Make GET['_a'] = "404".
+						$_GET['_a'] = '404';
+					}
 				} else {
 					$_GET['_a'] = '404';
 				}
@@ -673,6 +681,36 @@ class SEO {
 			trigger_error('Invalid SEO path type '.$type.'.', E_USER_NOTICE);
 			return false;
 		}
+	}
+
+	/**
+	 * Set a past path
+	 *
+	 * @param string $type
+	 * @param int $item_id
+	 * @param string $path
+	 * @return bool
+	 */
+	public function setPastPath($type, $item_id, $path) {
+		$path = SEO::_safeUrl($path);
+		// Get existing type/item_id/past_path in CubeCart_seo_log for this past_path
+		if (($existing = $GLOBALS['db']->select('CubeCart_seo_log', false, array('past_path' => $path))) !== false) { // We have an existing record for this past_path.
+		// If existing past_path but different type or item_id, send warning of existing past_path for different item
+			if($existing[0]['type'] != $type || $existing[0]['item_id'] != $item_id) { // This past_path is being used for a different item. Exiting false with error message.
+				$GLOBALS['gui']->setACPWarning('The prior SEO path is being used by something else.'); // TODO: Make a language phrase.
+				$return = false;
+			}
+		// Else existing past_path has same type/item_id, exit - nothing to do
+			else { // This past_path is being used for this same item. Exiting true.
+				$return = true;
+			}
+		// If no existing past_path, log it.
+		} else { // We do not have an existing record for this past_path, so log it and exit true.
+			$GLOBALS['db']->insert('CubeCart_seo_log',array('past_path' => $path, 'type' => $type, 'item_id' => $item_id));
+			$return = true;
+		}
+		// Exit
+		return $return;
 	}
 
 	/**

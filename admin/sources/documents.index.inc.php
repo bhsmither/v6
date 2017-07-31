@@ -30,6 +30,9 @@ if (isset($_POST['document']) && Admin::getInstance()->permissions('documents', 
 				$GLOBALS['seo']->delete('doc', $_POST['document']['doc_id']);
 			}
 			$GLOBALS['seo']->setdbPath('doc', $_POST['document']['doc_id'], $_POST['seo_path'], true, true);
+			if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+				$GLOBALS['seo']->setPastPath('doc', $_POST['document']['doc_id'], $_POST['seo_past_path']);
+			}
 			$GLOBALS['main']->setACPNotify($lang['documents']['notify_document_update']);
 			$rem_array = array('action');
 		} else {

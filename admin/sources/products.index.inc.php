@@ -359,6 +359,9 @@ if (isset($_POST['save']) && Admin::getInstance()->permissions('products', CC_PE
 		$GLOBALS['seo']->delete('prod', $product_id);
 	}
 	$GLOBALS['seo']->setdbPath('prod', $product_id, $_POST['seo_path']);
+	if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+		$GLOBALS['seo']->setPastPath('prod', $product_id, $_POST['seo_past_path']);
+	}
 
 	if (empty($_POST['primary_cat']) && count($_POST['categories'])>1) {
 		$GLOBALS['main']->setACPWarning($lang['catalogue']['title_category_defaulted']);

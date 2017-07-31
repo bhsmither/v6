@@ -82,6 +82,9 @@ if (isset($_POST['cat']) && is_array($_POST['cat']) && Admin::getInstance()->per
 				}
 				$GLOBALS['seo']->setdbPath('cat', $cat_id, $_POST['seo_path'], false, false);
 				$GLOBALS['seo']->rebuildCategoryList();
+				if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+					$GLOBALS['seo']->setPastPath('cat', $cat_id, $_POST['seo_past_path']);
+				}
 			}
 		}
 	} else {

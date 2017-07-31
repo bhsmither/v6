@@ -1935,6 +1935,7 @@
     <string name="seo_path_taken" introduced="5.0.0"><![CDATA[The SEO path specified is already in use with another item. A unique one has been specified for you. Please check and amend if necessary.]]></string>
     <string name="seo_rebuild" introduced="5.0.0"><![CDATA[Rebuild SEO?]]></string>
     <string name="seo_rebuild_description" introduced="5.0.0"><![CDATA[Do you want to rebuild SEO path?]]></string>
+    <string name="seo_log_past_path" introduced="5.0.0"><![CDATA[If this path is changed, log as a past path?]]></string>
     <string name="ship_per_item" introduced="5.0.0"><![CDATA[Per Item]]></string>
     <string name="ship_per_item_intl" introduced="5.0.0"><![CDATA[Per Item (International)]]></string>
     <string name="ship_per_order" introduced="5.0.0"><![CDATA[Per Shipment]]></string>
