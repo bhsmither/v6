@@ -697,7 +697,7 @@ class SEO {
 		if (($existing = $GLOBALS['db']->select('CubeCart_seo_log', false, array('past_path' => $path))) !== false) { // We have an existing record for this past_path.
 		// If existing past_path but different type or item_id, send warning of existing past_path for different item
 			if($existing[0]['type'] != $type || $existing[0]['item_id'] != $item_id) { // This past_path is being used for a different item. Exiting false with error message.
-				$GLOBALS['gui']->setACPWarning('The prior SEO path is being used by something else.'); // TODO: Make a language phrase.
+				$GLOBALS['gui']->setError('The prior SEO path is being used by something else.', true); // TODO: Make a language phrase.
 				$return = false;
 			}
 		// Else existing past_path has same type/item_id, exit - nothing to do
