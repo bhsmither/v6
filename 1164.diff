@@ -1,0 +1,221 @@
+Index: language/definitions.xml
+===================================================================
+--- language/definitions.xml	(.../branches/618_1164)	(revision 297)
++++ language/definitions.xml	(.../tags/618_debug)	(revision 297)
+@@ -1936,8 +1936,6 @@
+     <string name="seo_path_taken" introduced="5.0.0"><![CDATA[The SEO path specified is already in use with another item. A unique one has been specified for you. Please check and amend if necessary.]]></string>
+     <string name="seo_rebuild" introduced="5.0.0"><![CDATA[Rebuild SEO?]]></string>
+     <string name="seo_rebuild_description" introduced="5.0.0"><![CDATA[Do you want to rebuild SEO path?]]></string>
+-<string name="seo_log_past_path" introduced="5.0.0"><![CDATA[If this path is changed, log as a past path?]]></string>
+-<string name="seo_past_path_taken" introduced="5.0.0"><![CDATA[That prior SEO path is already in use with another item. That past path was not logged.]]></string>
+     <string name="ship_per_item" introduced="5.0.0"><![CDATA[Per Item]]></string>
+     <string name="ship_per_item_intl" introduced="5.0.0"><![CDATA[Per Item (International)]]></string>
+     <string name="ship_per_order" introduced="5.0.0"><![CDATA[Per Shipment]]></string>
+Index: admin/sources/categories.index.inc.php
+===================================================================
+--- admin/sources/categories.index.inc.php	(.../branches/618_1164)	(revision 297)
++++ admin/sources/categories.index.inc.php	(.../tags/618_debug)	(revision 297)
+@@ -82,11 +82,6 @@
+ 				}
+ 				$GLOBALS['seo']->setdbPath('cat', $cat_id, $_POST['seo_path'], false, false);
+ 				$GLOBALS['seo']->rebuildCategoryList();
+-
+-				if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+-					$GLOBALS['seo']->setPastPath('cat', $cat_id, $_POST['seo_past_path']);
+-				}
+-
+ 			}
+ 		}
+ 	} else {
+Index: admin/sources/documents.index.inc.php
+===================================================================
+--- admin/sources/documents.index.inc.php	(.../branches/618_1164)	(revision 297)
++++ admin/sources/documents.index.inc.php	(.../tags/618_debug)	(revision 297)
+@@ -30,11 +30,6 @@
+ 				$GLOBALS['seo']->delete('doc', $_POST['document']['doc_id']);
+ 			}
+ 			$GLOBALS['seo']->setdbPath('doc', $_POST['document']['doc_id'], $_POST['seo_path'], true, true);
+-
+-	if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+-		$GLOBALS['seo']->setPastPath('doc', $_POST['document']['doc_id'], $_POST['seo_past_path']);
+-	}
+-
+ 			$GLOBALS['main']->setACPNotify($lang['documents']['notify_document_update']);
+ 			$rem_array = array('action');
+ 		} else {
+Index: admin/sources/products.index.inc.php
+===================================================================
+--- admin/sources/products.index.inc.php	(.../branches/618_1164)	(revision 297)
++++ admin/sources/products.index.inc.php	(.../tags/618_debug)	(revision 297)
+@@ -360,10 +360,6 @@
+ 	}
+ 	$GLOBALS['seo']->setdbPath('prod', $product_id, $_POST['seo_path']);
+ 
+-	if(!empty($_POST['log_past_path']) && $_POST['log_past_path'] && trim($_POST['seo_past_path']) != trim($_POST['seo_path'])) {
+-		$GLOBALS['seo']->setPastPath('prod', $product_id, $_POST['seo_past_path']);
+-	}
+-
+ 	if (empty($_POST['primary_cat']) && count($_POST['categories'])>1) {
+ 		$GLOBALS['main']->setACPWarning($lang['catalogue']['title_category_defaulted']);
+ 		$rem_array = false;
+Index: admin/skins/default/styles/layout.css
+===================================================================
+--- admin/skins/default/styles/layout.css	(.../branches/618_1164)	(revision 297)
++++ admin/skins/default/styles/layout.css	(.../tags/618_debug)	(revision 297)
+@@ -601,7 +601,7 @@
+     background-color: #edf4f7
+ }
+ fieldset .checkbox {
+-    vertical-align: middle; /* margin-top: 4px */
++    margin-top: 4px
+ }
+ .thead,
+ thead td,
+Index: admin/skins/default/templates/documents.index.php
+===================================================================
+--- admin/skins/default/templates/documents.index.php	(.../branches/618_1164)	(revision 297)
++++ admin/skins/default/templates/documents.index.php	(.../tags/618_debug)	(revision 297)
+@@ -89,11 +89,6 @@
+ 	<fieldset><legend>{$LANG.settings.title_seo_meta_data}</legend>
+ 	  <div><label for="seo_meta_title">{$LANG.settings.seo_meta_title}</label><span><input type="text" name="document[seo_meta_title]" id="seo_meta_title" value="{$DOCUMENT.seo_meta_title}" class="textbox"></span></div>
+ 	  <div><label for="seo_path">{$LANG.settings.seo_path} *</label><span><input name="seo_path" id="seo_path" class="textbox" type="text" value="{$DOCUMENT.seo_path}"></span></div>
+-
+-	  {if isset($DOCUMENT.seo_path)}
+-	  <div><label for="log_past_path">{$LANG.settings.seo_log_past_path}</label><span><input type="hidden" name="log_past_path" id="log_past_path" value="1" class="toggle"></span> <span><input name="seo_past_path" id="seo_past_path" class="textbox" type="text" value="{$DOCUMENT.seo_path}" readonly></span></div>
+-	  {/if}
+-
+ 	  <div><label for="seo_meta_keywords">{$LANG.settings.seo_meta_keywords}</label><span><input type="text" name="document[seo_meta_keywords]" id="seo_meta_keywords" value="{$DOCUMENT.seo_meta_keywords}" class="textbox"></span></div>
+ 	  <div><label for="seo_meta_description">{$LANG.settings.seo_meta_description}</label><span><textarea name="document[seo_meta_description]" id="seo_meta_description" class="textbox">{$DOCUMENT.seo_meta_description}</textarea></span></div>
+ 	</fieldset>
+Index: admin/skins/default/templates/products.index.php
+===================================================================
+--- admin/skins/default/templates/products.index.php	(.../branches/618_1164)	(revision 297)
++++ admin/skins/default/templates/products.index.php	(.../tags/618_debug)	(revision 297)
+@@ -592,11 +592,6 @@
+          <legend>{$LANG.settings.title_seo_meta_data}</legend>
+          <div><label for="seo_meta_title">{$LANG.settings.seo_meta_title}</label><span><input name="seo_meta_title" id="seo_meta_title" class="textbox" type="text" value="{$PRODUCT.seo_meta_title}"></span></div>
+          <div><label for="seo_path">{$LANG.settings.seo_path} *</label><span><input name="seo_path" id="seo_path" class="textbox" type="text" value="{$PRODUCT.seo_path}"></span></div>
+-
+-         {if isset($PRODUCT.seo_path)}
+-         <div><label for="log_past_path">{$LANG.settings.seo_log_past_path}</label><span><input type="hidden" name="log_past_path" id="log_past_path" value="1" class="toggle"></span> <span><input name="seo_past_path" id="seo_past_path" class="textbox" type="text" value="{$PRODUCT.seo_path}" readonly></span></div>
+-         {/if}
+-
+          <div><label for="seo_meta_keywords">{$LANG.settings.seo_meta_keywords}</label><span><textarea name="seo_meta_keywords" id="seo_meta_keywords" class="textbox">{$PRODUCT.seo_meta_keywords}</textarea></span></div>
+          <div><label for="seo_meta_description">{$LANG.settings.seo_meta_description}</label><span><textarea name="seo_meta_description" id="seo_meta_description" class="textbox">{$PRODUCT.seo_meta_description}</textarea></span></div>
+       </fieldset>
+Index: admin/skins/default/templates/categories.index.php
+===================================================================
+--- admin/skins/default/templates/categories.index.php	(.../branches/618_1164)	(revision 297)
++++ admin/skins/default/templates/categories.index.php	(.../tags/618_debug)	(revision 297)
+@@ -121,11 +121,6 @@
+     <fieldset>
+ 	  <div><label for="seo_meta_title">{$LANG.settings.seo_meta_title}</label><span><input type="text" name="cat[seo_meta_title]" id="seo_meta_title" class="textbox" value="{$CATEGORY.seo_meta_title}"></span></div>
+ 	  <div><label for="seo_path">{$LANG.settings.seo_path} *</label><span><input type="text" name="seo_path" id="seo_path" class="textbox" value="{$CATEGORY.seo_path}"></span></div>
+-
+-	  {if isset($CATEGORY.seo_path)}
+-	  <div><label for="log_past_path">{$LANG.settings.seo_log_past_path}</label><span><input type="hidden" name="log_past_path" id="log_past_path" value="1" class="toggle"></span> <span><input name="seo_past_path" id="seo_past_path" class="textbox" type="text" value="{$CATEGORY.seo_path}" readonly></span></div>
+-	  {/if}
+-
+ 	  <div><label for="seo_meta_keywords">{$LANG.settings.seo_meta_keywords}</label><span><textarea name="cat[seo_meta_keywords]" id="seo_meta_keywords" class="textbox">{$CATEGORY.seo_meta_keywords}</textarea></span></div>
+ 	  <div><label for="seo_meta_description">{$LANG.settings.seo_meta_description}</label><span><textarea name="cat[seo_meta_description]" id="seo_meta_description" class="textbox">{$CATEGORY.seo_meta_description}</textarea></span></div>
+ 	</fieldset>
+Index: classes/seo.class.php
+===================================================================
+--- classes/seo.class.php	(.../branches/618_1164)	(revision 297)
++++ classes/seo.class.php	(.../tags/618_debug)	(revision 297)
+@@ -199,9 +199,6 @@
+ 	 */
+ 	public function delete($type, $item_id) { dbgClue(__METHOD__);
+ 		if (in_array($type, $this->_dynamic_sections) && is_numeric($item_id)) {
+-
+-			$GLOBALS['db']->delete('CubeCart_seo_log', array('type' => $type, 'item_id' => $item_id));
+-
+ 			return $GLOBALS['db']->delete('CubeCart_seo_urls', array('type' => $type, 'item_id' => $item_id));
+ 		}
+ 		return false;
+@@ -382,12 +379,7 @@
+ 					$GLOBALS['cache']->clear(); dbgClue('Cache cleared. Set session with an seo_retry...',array(),false);
+ 					$GLOBALS['session']->set($path, '1', 'seo_retry'); dbgClue('Bouncing out to this $path for another try.',array(),false);
+ 					httpredir(CC_ROOT_REL.$path);
+-
+-				} else if(($item = $GLOBALS['db']->select('CubeCart_seo_log',false,array('past_path' => $path))) !== false) { dbgClue('We now look for a past_path. Query for it.',$item,false);
+-					$current_path = $this->getdbPath($item[0]['type'], $item[0]['item_id']);
+-					if(!empty($current_path)) { dbgClue('Found a past path for '.$item[0]['type'].'-'.$item[0]['item_id'].': '.$item[0]['past_path'].'. Get the real SEO path and 301 bounce.',array(),false); httpredir(CC_ROOT_REL.$current_path/*,false,false,301*/); }
+-					else { dbgClue('Did not find a past path for '.$item[0]['type'].'-'.$item[0]['item_id'].'. Make GET[\'_a\'] = "404".',array(),false); $_GET['_a'] = '404'; }
+-				} else { dbgClue('The session seo_retry failed as well did the query for a past path. Make GET[\'_a\'] = "404".',array(),false);
++				} else { dbgClue('We had set session for an seo_retry. Make GET[\'_a\'] = "404".',array(),false);
+ 					$_GET['_a'] = '404';
+ 				}
+ 			}
+@@ -720,34 +712,6 @@
+ 	}
+ 
+ 	/**
+-	 * Set a past path
+-	 *
+-	 * @param string $type
+-	 * @param int $item_id
+-	 * @param string $path
+-	 * @return bool
+-	 */
+-	public function setPastPath($type, $item_id, $path) { dbgClue(__METHOD__);
+-		$path = SEO::_safeUrl($path); dbgClue('Is there this past path in the database?',array('past_path' => $path),false);
+-		// Get existing type/item_id/past_path in CubeCart_seo_log for this past_path
+-		if (($existing = $GLOBALS['db']->select('CubeCart_seo_log', false, array('past_path' => $path))) !== false) { dbgClue('We have an existing record for this past_path.',$existing,false);
+-
+-		// If existing past_path but different type or type/item_id, send warning of existing past_path for different item
+-			if($existing[0]['type'] != $type || $existing[0]['item_id'] != $item_id) { dbgClue('This past_path is being used for a different item. Exiting false with error message.',array(),false); $GLOBALS['gui']->setError($GLOBALS['language']->settings['seo_past_path_taken'],true); $return = false; }
+-
+-		// Else existing past_path has same type/item_id, exit - nothing to do
+-			else { dbgClue('This past_path is being used for this same item. Exiting true (with notice message?).',array(),false); /* $GLOBALS['gui']->setACPNotify('The prior SEO path has already been logged for the product.'); */ $return = true; }
+-
+-		// If no existing past_path, log it.
+-		} else { dbgClue('We do not have an existing record for this past_path, so log it.',array(),false);
+-			$GLOBALS['db']->insert('CubeCart_seo_log',array('past_path' => $path, 'type' => $type, 'item_id' => $item_id));
+-			$return = true;
+-		}
+-		// Exit
+-		return $return;
+-	}
+-
+-	/**
+ 	 * Set all meta data
+ 	 *
+ 	 * @param array $meta_data
+Index: setup/db/install/structure.sql
+===================================================================
+--- setup/db/install/structure.sql	(.../branches/618_1164)	(revision 297)
++++ setup/db/install/structure.sql	(.../tags/618_debug)	(revision 297)
+@@ -907,17 +907,6 @@
+   KEY `custom` (`custom`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1; #EOQ
+ 
+-CREATE TABLE IF NOT EXISTS `CubeCart_seo_log` (
+-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+-  `past_path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+-  `type` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+-  `item_id` int(25) unsigned DEFAULT NULL,
+-  PRIMARY KEY (`past_path`),
+-  KEY `id` (`id`),
+-  KEY `type` (`type`),
+-  KEY `item_id` (`item_id`)
+-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1; #EOQ
+-
+ CREATE TABLE IF NOT EXISTS `CubeCart_email_log` (
+   `id` int(11) NOT NULL,
+   `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+Index: setup/db/upgrade/6.1.8.1164.sql
+===================================================================
+--- setup/db/upgrade/6.1.8.1164.sql	(.../branches/618_1164)	(revision 297)
++++ setup/db/upgrade/6.1.8.1164.sql	(.../tags/618_debug)	(revision 297)
+@@ -1,10 +0,0 @@
+-CREATE TABLE `CubeCart_seo_log` (
+-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+-  `past_path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+-  `type` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+-  `item_id` int(25) unsigned DEFAULT NULL
+-  PRIMARY KEY (`past_path`),
+-  KEY `id` (`id`),
+-  KEY `type` (`type`),
+-  KEY `item_id` (`item_id`)
+-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1; #EOQ

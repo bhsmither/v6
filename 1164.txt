@@ -1,0 +1,42 @@
+[X] Update /setup/db/install/structure to add CubeCart_seo_log
+[X] Add /setup/db/update/6.1.8.1164.sql to modify current database
+[X] Actually add table to database
+[X] Determine if checkbox to add past path to database
+[X] Add method to SEO class setPastPath()
+[X] Add checkbox to Edit (not Add|Clone) Product admin screen, default checked, to add past path to database
+[X] Use language phrase for checkbox
+[X] Checkbox caption to include current path to be databased
+[X] Before deciding 404 type/id not found, query for past paths
+[X] A match with a past path/type/id queries for the current path for type/id
+[X] The current path is 301 bounce
+[X] No match with a past path/type/id continues with 404
+[X] Add language phrase to definitions.xml
+
+[X] Check for database entry on having changed a product SEO with checkbox checked
+[X] Check for database entry on having changed a category SEO with checkbox checked
+[X] Check for database entry on having changed a document SEO with checkbox checked
+[X] Check an actual bounce occurs to the new product having used a retired SEO
+[X] Check an actual bounce occurs to the new category having used a retired SEO
+[X] Check an actual bounce occurs to the new document having used a retired SEO
+[X] Check for a 404 result using an unknown SEO URL
+[X] Check for a product using the current SEO URL
+[X] Check for a category using the current SEO URL
+[X] Check for a document using the current SEO URL
+
+[X] Delete a product, deletes the past paths
+[X] Delete a category, deletes the past paths
+[X] Delete a document, deletes the past paths
+
+[X] Determine what to do on past path collision with a different item
+    Exit false with Warning
+[ ] Determine what to do on past path collision with same item
+    Not an issue, simply exit
+[ ] Check changing to a URL that was previously retired
+    Not an issue. If current, will be used
+
+TODO:
+[X] Make a phrase for existing past path
+[ ] Delete specific past paths? In case a different type/item_id wants to have this past path
+[ ] Add checkbox to Maintenance, Rebuild to trigger clearing all 301 eligible SEO URL's
+[ ] Determine if checkbox to clear all 301 eligible SEO URL's
+
